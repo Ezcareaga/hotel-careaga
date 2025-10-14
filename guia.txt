@@ -12,6 +12,21 @@ docker-compose up -d
 # Iniciar Quarkus
 mvn quarkus:dev
 
+http://localhost:8080/swagger-ui
+--------------------------------------------------------
+#iniciar base de datos y ver status
+docker-compose up -d
+docker ps
+docker-compose down / -v #para reiniciar y borrar datos
+docker-compose restart
+-------------------------------------------------------
+#detener quarkus
+Ctrl + C
+mvn clean
+mvn quarkus:dev
+-------------------------------------------------------
+Conectarse a al BD Y usar sql
+docker exec -it hotel-careaga-db psql -U admin -d hoteldb
 
 Orden para el uso del sistema
 1. POST /habitaciones (crear habitaciones)
