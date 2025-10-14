@@ -1,0 +1,77 @@
+### Variables
+@baseUrl = http://localhost:8080
+
+### HABITACIONES
+
+### Crear habitación 101
+POST {{baseUrl}}/habitaciones
+Content-Type: application/json
+
+{
+  "numero": "101",
+  "tipo": "SIMPLE",
+  "precio": 150000,
+  "capacidad": 2
+}
+
+### Crear habitación 201
+POST {{baseUrl}}/habitaciones
+Content-Type: application/json
+
+{
+  "numero": "201",
+  "tipo": "SUITE",
+  "precio": 450000,
+  "capacidad": 6
+}
+
+### Listar todas
+GET {{baseUrl}}/habitaciones
+
+### Buscar por ID
+GET {{baseUrl}}/habitaciones/1
+
+### Actualizar
+PUT {{baseUrl}}/habitaciones/1
+Content-Type: application/json
+
+{
+  "numero": "101",
+  "tipo": "SIMPLE",
+  "precio": 175000,
+  "capacidad": 2
+}
+
+### Eliminar
+DELETE {{baseUrl}}/habitaciones/99
+
+### RESERVAS
+
+### Crear reserva
+POST {{baseUrl}}/reservas
+Content-Type: application/json
+
+{
+  "idHabitacion": 1,
+  "fechaInicio": "2025-11-01",
+  "fechaFin": "2025-11-05",
+  "nombreCliente": "Juan Pérez",
+  "emailCliente": "juan@email.com",
+  "telefonoCliente": "0981234567",
+  "ciCliente": "1234567"
+}
+
+### Listar todas
+GET {{baseUrl}}/reservas
+
+### Filtrar por estado
+GET {{baseUrl}}/reservas?estado=PENDIENTE
+
+### Check-in
+PUT {{baseUrl}}/reservas/1/checkin
+
+### Check-out
+PUT {{baseUrl}}/reservas/1/checkout
+
+### Cancelar
+PUT {{baseUrl}}/reservas/1/cancelar

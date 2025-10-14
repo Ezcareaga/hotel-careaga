@@ -1,0 +1,25 @@
+Para resetear datos manualmente
+Si se tiene propierties en update
+
+# Detener Quarkus (Ctrl + C)
+
+# Borrar base de datos
+docker-compose down -v
+
+# Recrear base de datos vacía
+docker-compose up -d
+
+# Iniciar Quarkus
+mvn quarkus:dev
+
+
+Orden para el uso del sistema
+1. POST /habitaciones (crear habitaciones)
+   ↓
+2. GET /habitaciones (verificar IDs)
+   ↓
+3. POST /reservas (usar idHabitacion real)
+   ↓
+4. PUT /reservas/{id}/checkin
+   ↓
+5. PUT /reservas/{id}/checkout
