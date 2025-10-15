@@ -65,6 +65,12 @@ public class HabitacionService {
         }
         
         Habitacion habitacion = optional.get();
+
+        // Validar unicidad de número si cambia o para evitar duplicados
+        Optional<Habitacion> otra = habitacionRepository.findByNumero(dto.numero);
+        if (otra.isPresent() && !otra.get().getId().equals(habitacion.getId())) {
+            throw new IllegalArgumentException("Ya existe habitación con número: " + dto.numero);
+        }
         habitacion.setNumero(dto.numero);
         habitacion.setTipo(dto.tipo);
         habitacion.setPrecio(dto.precio);

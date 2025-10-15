@@ -1,7 +1,9 @@
 ### Variables
 @baseUrl = http://localhost:8080
 
+############################################################
 ### HABITACIONES
+############################################################
 
 ### Crear habitación 101
 POST {{baseUrl}}/habitaciones
@@ -22,16 +24,16 @@ Content-Type: application/json
   "numero": "201",
   "tipo": "SUITE",
   "precio": 450000,
-  "capacidad": 6
+  "capacidad": 4
 }
 
-### Listar todas
+### Listar habitaciones
 GET {{baseUrl}}/habitaciones
 
-### Buscar por ID
+### Buscar habitación por ID (1)
 GET {{baseUrl}}/habitaciones/1
 
-### Actualizar
+### Actualizar habitación 1
 PUT {{baseUrl}}/habitaciones/1
 Content-Type: application/json
 
@@ -42,12 +44,65 @@ Content-Type: application/json
   "capacidad": 2
 }
 
-### Eliminar
-DELETE {{baseUrl}}/habitaciones/99
+### Eliminar habitación 2 (esperado 204)
+DELETE {{baseUrl}}/habitaciones/2
 
+### Buscar habitación 2 (esperado 404)
+GET {{baseUrl}}/habitaciones/2
+
+
+############################################################
+### SERVICIOS EXTRA
+############################################################
+
+### Crear servicio extra: Desayuno
+POST {{baseUrl}}/servicios-extra
+Content-Type: application/json
+
+{
+  "nombre": "Desayuno Buffet",
+  "precio": 30000,
+  "descripcion": "Café, frutas y panes"
+}
+
+### Crear servicio extra: Spa
+POST {{baseUrl}}/servicios-extra
+Content-Type: application/json
+
+{
+  "nombre": "Spa",
+  "precio": 120000,
+  "descripcion": "Acceso diario"
+}
+
+### Listar servicios extra
+GET {{baseUrl}}/servicios-extra
+
+### Obtener servicio extra 1
+GET {{baseUrl}}/servicios-extra/1
+
+### Actualizar servicio extra 1
+PUT {{baseUrl}}/servicios-extra/1
+Content-Type: application/json
+
+{
+  "nombre": "Desayuno Buffet",
+  "precio": 35000,
+  "descripcion": "Café, frutas, panes y huevos"
+}
+
+### Eliminar servicio extra 2 (esperado 204)
+DELETE {{baseUrl}}/servicios-extra/2
+
+### Obtener servicio extra 2 (esperado 404)
+GET {{baseUrl}}/servicios-extra/2
+
+
+############################################################
 ### RESERVAS
+############################################################
 
-### Crear reserva
+### Crear reserva (Lionel Messi) para habitación 1
 POST {{baseUrl}}/reservas
 Content-Type: application/json
 
@@ -55,23 +110,163 @@ Content-Type: application/json
   "idHabitacion": 1,
   "fechaInicio": "2025-11-01",
   "fechaFin": "2025-11-05",
-  "nombreCliente": "Juan Pérez",
-  "emailCliente": "juan@email.com",
-  "telefonoCliente": "0981234567",
+  "nombreCliente": "Lionel Messi",
+  "emailCliente": "lmessi@example.com",
+  "telefonoCliente": "0981000000",
   "ciCliente": "1234567"
 }
 
-### Listar todas
+### Listar reservas
 GET {{baseUrl}}/reservas
 
-### Filtrar por estado
+### Filtrar por estado (PENDIENTE)
 GET {{baseUrl}}/reservas?estado=PENDIENTE
 
-### Check-in
+### Obtener reserva 1
+GET {{baseUrl}}/reservas/1
+
+### Actualizar reserva 1 (cambiar teléfono)
+PUT {{baseUrl}}/reservas/1
+Content-Type: application/json
+
+{
+  "idHabitacion": 1,
+  "fechaInicio": "2025-11-01",
+  "fechaFin": "2025-11-05",
+  "nombreCliente": "Lionel Messi",
+  "emailCliente": "lmessi@example.com",
+  "telefonoCliente": "0981000001",
+  "ciCliente": "1234567"
+}
+
+### Check-in reserva 1 (esperado 200)
 PUT {{baseUrl}}/reservas/1/checkin
 
-### Check-out
+### Check-in nuevamente (esperado 400)
+PUT {{baseUrl}}/reservas/1/checkin
+
+### Check-out reserva 1 (esperado 200)
 PUT {{baseUrl}}/reservas/1/checkout
 
-### Cancelar
-PUT {{baseUrl}}/reservas/1/cancelar
+### Check-out nuevamente (esperado 400)
+PUT {{baseUrl}}/reservas/1/checkout
+
+### Eliminar reserva 1 (esperado 204)
+DELETE {{baseUrl}}/reservas/1
+
+### Obtener reserva 1 (esperado 404)
+GET {{baseUrl}}/reservas/1
+
+### Crear reserva (Cristiano Ronaldo) y cancelarla
+POST {{baseUrl}}/reservas
+Content-Type: application/json
+
+{
+  "idHabitacion": 1,
+  "fechaInicio": "2025-12-10",
+  "fechaFin": "2025-12-12",
+  "nombreCliente": "Cristiano Ronaldo",
+  "emailCliente": "cr7@example.com",
+  "telefonoCliente": "0981000002",
+  "ciCliente": "7654321"
+}
+
+### Cancelar reserva 2 (esperado 200)
+PUT {{baseUrl}}/reservas/2/cancelar
+
+### Filtrar por estado (CANCELADA) debe incluir reserva 2
+GET {{baseUrl}}/reservas?estado=CANCELADA
+
+### Filtro inválido (esperado 400)
+GET {{baseUrl}}/reservas?estado=INVALIDO
+
+
+############################################################
+### CONSUMOS
+############################################################
+
+### Crear NUEVO servicio extra (Room Service) para consumo
+POST {{baseUrl}}/servicios-extra
+Content-Type: application/json
+
+{
+  "nombre": "Room Service",
+  "precio": 60000,
+  "descripcion": "Comidas a la habitación"
+}
+
+### Crear NUEVA reserva (Neymar Jr) para consumo
+POST {{baseUrl}}/reservas
+Content-Type: application/json
+
+{
+  "idHabitacion": 1,
+  "fechaInicio": "2026-01-05",
+  "fechaFin": "2026-01-08",
+  "nombreCliente": "Neymar Jr",
+  "emailCliente": "neymar@example.com",
+  "telefonoCliente": "0981000003",
+  "ciCliente": "3334445"
+}
+
+### Crear consumo (reserva 3, servicio extra 3)
+POST {{baseUrl}}/consumos
+Content-Type: application/json
+
+{
+  "reservaId": 3,
+  "servicioId": 3,
+  "cantidad": 2
+}
+
+### Listar consumos
+GET {{baseUrl}}/consumos
+
+### Obtener consumo 1
+GET {{baseUrl}}/consumos/1
+
+### Actualizar consumo 1 (cantidad 3)
+PUT {{baseUrl}}/consumos/1
+Content-Type: application/json
+
+{
+  "reservaId": 3,
+  "servicioId": 3,
+  "cantidad": 3
+}
+
+### Eliminar consumo 1 (esperado 204)
+DELETE {{baseUrl}}/consumos/1
+
+### Obtener consumo 1 (esperado 404)
+GET {{baseUrl}}/consumos/1
+
+
+############################################################
+### CASOS DE VALIDACIÓN (400)
+############################################################
+
+### Crear habitación inválida (falta número) (esperado 400)
+POST {{baseUrl}}/habitaciones
+Content-Type: application/json
+
+{
+  "tipo": "SIMPLE",
+  "precio": 100000,
+  "capacidad": 2
+}
+
+### Crear reserva con email inválido (esperado 400)
+POST {{baseUrl}}/reservas
+Content-Type: application/json
+
+{
+  "idHabitacion": 1,
+  "fechaInicio": "2026-02-01",
+  "fechaFin": "2026-02-03",
+  "nombreCliente": "Kylian Mbappé",
+  "emailCliente": "no-es-email",
+  "telefonoCliente": "0981000004",
+  "ciCliente": "9998887"
+}
+
