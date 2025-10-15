@@ -130,4 +130,34 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.FINALIZADA);
         return Optional.of(reserva);
     }
+
+    /**
+     * Actualiza una reserva existente
+     */
+    @jakarta.transaction.Transactional
+    public Optional<Reserva> actualizar(Long id, ReservaDTO dto) {
+        Optional<Reserva> opt = reservaRepository.findByIdOptional(id);
+        if (opt.isEmpty()) return Optional.empty();
+
+        Habitacion habitacion = habitacionRepository.findByIdOptional(dto.idHabitacion)
+                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada con ID: " + dto.idHabitacion));
+
+        Reserva r = opt.get();
+        r.setHabitacion(habitacion);
+        r.setFechaInicio(dto.fechaInicio);
+        r.setFechaFin(dto.fechaFin);
+        r.setNombreCliente(dto.nombreCliente);
+        r.setEmailCliente(dto.emailCliente);
+        r.setTelefonoCliente(dto.telefonoCliente);
+        r.setCiCliente(dto.ciCliente);
+        return Optional.of(r);
+    }
+
+    /**
+     * Elimina una reserva por ID
+     */
+    @jakarta.transaction.Transactional
+    public boolean eliminar(Long id) {
+        return reservaRepository.deleteById(id);
+    }
 }

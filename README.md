@@ -1,78 +1,91 @@
-# hotel-careaga-api
+# Hotel Careaga API
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+API simple para gestión de hotel con Quarkus (Java 17): habitaciones, reservas, servicios extra y consumos. Incluye validaciones, manejo de errores y documentación OpenAPI.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+**Stack**
+- Quarkus REST + Jackson, Hibernate ORM con Panache, Bean Validation, SmallRye OpenAPI
+- PostgreSQL (Docker Compose)
 
-## Running the application in dev mode
+**Estructura**
+- `src/main/java/py/com/hotelcareaga/entity` (JPA)
+- `src/main/java/py/com/hotelcareaga/dto` (DTOs con Bean Validation)
+- `src/main/java/py/com/hotelcareaga/repository` (Panache)
+- `src/main/java/py/com/hotelcareaga/service` (lógica/tx)
+- `src/main/java/py/com/hotelcareaga/resource` (REST + OpenAPI)
 
-You can run your application in dev mode that enables live coding using:
+## Cómo correr
+- Base de datos: `docker-compose up -d`
+- App en dev: `./mvnw quarkus:dev`
+- Swagger UI: `http://localhost:8080/swagger-ui`
+- Dev UI: `http://localhost:8080/q/dev/`
 
-```shell script
-./mvnw quarkus:dev
+Config DB en `src/main/resources/application.properties`. Para demo se usa `drop-and-create` (solo dev).
+
+## Endpoints principales
+
+Habitaciones (`/habitaciones`)
+- GET `/` listar | GET `/{id}` por id
+- POST `/` crear | PUT `/{id}` actualizar | DELETE `/{id}` borrar
+
+Reservas (`/reservas`)
+- GET `/` listar (opcional `?estado=PENDIENTE|EN_CURSO|FINALIZADA|CANCELADA`)
+- GET `/{id}` por id | POST `/` crear | PUT `/{id}` actualizar | DELETE `/{id}` borrar
+- Acciones: PUT `/{id}/checkin`, PUT `/{id}/checkout`, PUT `/{id}/cancelar`
+
+Servicios Extra (`/servicios-extra`)
+- GET `/`, GET `/{id}`, POST `/`, PUT `/{id}`, DELETE `/{id}`
+
+Consumos (`/consumos`)
+- GET `/`, GET `/{id}`, POST `/`, PUT `/{id}`, DELETE `/{id}`
+
+## Validaciones y errores
+- Bean Validation en DTOs (ej.: `@NotBlank`, `@Email`, `@Min`)
+- `@Valid` en `POST/PUT`
+- Mappers globales: 400 por validación/estado inválido y cuerpo JSON con detalle
+
+## Pruebas (tests)
+
+Escribe tests con `@QuarkusTest` y RestAssured.
+
+Ejemplo (crear habitación):
+```java
+// src/test/java/py/com/hotelcareaga/HabitacionResourceTest.java
+package py.com.hotelcareaga;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+@QuarkusTest
+class HabitacionResourceTest {
+  @Test
+  void crearHabitacion() {
+    given()
+      .contentType("application/json")
+      .body("{\"numero\":\"101\",\"tipo\":\"SIMPLE\",\"precio\":150000,\"capacidad\":2}")
+    .when()
+      .post("/habitaciones")
+    .then()
+      .statusCode(201)
+      .body("numero", is("101"));
+  }
+}
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+Comandos:
+- Ejecutar tests: `./mvnw test`
+- Pruebas + verificación: `./mvnw verify`
 
-## Packaging and running the application
+Sugerencias:
+- Usar `@TestMethodOrder` y limpiar datos si cambias el esquema.
+- Para endpoints que leen DB, crear datos con `POST` en `@BeforeEach`.
 
-The application can be packaged using:
+## Demo rápida
+- Levantar DB y app (ver “Cómo correr”).
+- Probar con `api-tests.http` o via Swagger UI.
 
-```shell script
-./mvnw package
-```
+## Notas
+- Evitar usar credenciales en claro para producción.
+- Considerar migraciones (Flyway/Liquibase) si escalás el proyecto.
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/hotel-careaga-api-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
