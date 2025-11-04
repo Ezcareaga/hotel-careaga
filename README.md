@@ -6,6 +6,39 @@ API simple para gestión de hotel con Quarkus (Java 17): habitaciones, reservas,
 - Quarkus REST + Jackson, Hibernate ORM con Panache, Bean Validation, SmallRye OpenAPI
 - PostgreSQL (Docker Compose)
 
+##  Seguridad y Auditoría
+**Nota**: Endpoints POST/PUT de Habitaciones y Reservas requieren `adminKey` en el body.
+
+### Validación con AdminKey
+Operaciones de escritura (POST, PUT) requieren `adminKey: "admin123"` en el body del request:
+```json
+{
+  "adminKey": "admin123",
+  "numero": "101",
+  ...
+}
+```
+
+Sin adminKey válido → `SecurityException: Acceso denegado`
+
+### Auditoría Automática
+Cada registro guarda quién y cuándo:
+- `created_by`, `created_at`: Usuario y fecha de creación
+- `updated_by`, `updated_at`: Usuario y fecha de última modificación
+
+## 🏗️ Arquitectura - Patrón Repository
+
+Implementación del patrón Repository para separar responsabilidades:
+
+**Flujo**: Resource (HTTP) → Service (Lógica) → Repository (Acceso BD) → Entity (Datos)
+
+**Ventajas**:
+- Separación de responsabilidades
+- Código testeable y reutilizable
+- Fácil mantenimiento
+
+Ver documento completo: [`patron-repository.md`](patron-repository.md)
+
 **Estructura**
 - `src/main/java/py/com/hotelcareaga/entity` (JPA)
 - `src/main/java/py/com/hotelcareaga/dto` (DTOs con Bean Validation)
@@ -22,6 +55,12 @@ API simple para gestión de hotel con Quarkus (Java 17): habitaciones, reservas,
 Config DB en `src/main/resources/application.properties`. Para demo se usa `drop-and-create` (solo dev).
 
 ## Endpoints principales
+
+### Estados de Reserva
+- **PENDIENTE**: Reserva creada
+- **EN_CURSO**: Check-in realizado
+- **FINALIZADA**: Check-out completado
+- **CANCELADA**: Reserva cancelada
 
 Habitaciones (`/habitaciones`)
 - GET `/` listar | GET `/{id}` por id
