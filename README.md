@@ -26,7 +26,7 @@ Cada registro guarda quién y cuándo:
 - `created_by`, `created_at`: Usuario y fecha de creación
 - `updated_by`, `updated_at`: Usuario y fecha de última modificación
 
-## 🏗️ Arquitectura - Patrón Repository
+##  Arquitectura - Patrón Repository
 
 Implementación del patrón Repository para separar responsabilidades:
 
