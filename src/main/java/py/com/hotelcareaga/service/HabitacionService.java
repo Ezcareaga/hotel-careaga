@@ -35,6 +35,9 @@ public class HabitacionService {
      */
     @Transactional
     public Habitacion crear(HabitacionDTO dto) {
+        if (dto.adminKey == null || !"admin123".equals(dto.adminKey)) {
+            throw new SecurityException("Acceso denegado: adminKey inválido");
+        }
         // Validar que el número no exista
         Optional<Habitacion> existe = habitacionRepository.findByNumero(dto.numero);
         if (existe.isPresent()) {
@@ -46,7 +49,11 @@ public class HabitacionService {
         habitacion.setNumero(dto.numero);
         habitacion.setTipo(dto.tipo);
         habitacion.setPrecio(dto.precio);
-        habitacion.setCapacidad(dto.capacidad);
+         habitacion.setCapacidad(dto.capacidad);
+        
+        // Guardar quién creó
+        habitacion.setCreatedBy("admin");
+        habitacion.setUpdatedBy("admin");
         
         // Persistir
         habitacionRepository.persist(habitacion);
@@ -58,6 +65,10 @@ public class HabitacionService {
      */
     @Transactional
     public Optional<Habitacion> actualizar(Long id, HabitacionDTO dto) {
+            // VALIDAR ADMIN KEY
+        if (dto.adminKey == null || !"admin123".equals(dto.adminKey)) {
+            throw new SecurityException("Acceso denegado: adminKey inválido");
+        }
         Optional<Habitacion> optional = habitacionRepository.findByIdOptional(id);
         
         if (optional.isEmpty()) {
@@ -75,6 +86,7 @@ public class HabitacionService {
         habitacion.setTipo(dto.tipo);
         habitacion.setPrecio(dto.precio);
         habitacion.setCapacidad(dto.capacidad);
+        habitacion.setUpdatedBy("admin");
         
         // No necesitas persist() en update, Hibernate detecta cambios
         return Optional.of(habitacion);

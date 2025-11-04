@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 public class ReservaDTO {
+    public String adminKey;
+
     @NotNull
     public Long idHabitacion;
 

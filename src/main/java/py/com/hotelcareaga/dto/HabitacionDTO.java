@@ -3,6 +3,8 @@ package py.com.hotelcareaga.dto;
 import jakarta.validation.constraints.*;
 
 public class HabitacionDTO {
+    public String adminKey;
+
     @NotBlank
     @Size(max = 10)
     public String numero;

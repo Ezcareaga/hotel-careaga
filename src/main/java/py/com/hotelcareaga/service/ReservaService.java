@@ -48,6 +48,10 @@ public class ReservaService {
      */
     @Transactional
     public Reserva crear(ReservaDTO dto) {
+        // VALIDAR ADMIN KEY
+        if (dto.adminKey == null || !"admin123".equals(dto.adminKey)) {
+            throw new SecurityException("Acceso denegado: adminKey inválido");
+        }
         // Validar que habitación existe
         Optional<Habitacion> habitacionOpt = habitacionRepository.findByIdOptional(dto.idHabitacion);
         if (habitacionOpt.isEmpty()) {
@@ -66,6 +70,8 @@ public class ReservaService {
         reserva.setTelefonoCliente(dto.telefonoCliente);
         reserva.setCiCliente(dto.ciCliente);
         reserva.setEstado(EstadoReserva.PENDIENTE);
+        reserva.setCreatedBy("admin");
+        reserva.setUpdatedBy("admin");
         
         reservaRepository.persist(reserva);
         return reserva;
@@ -84,6 +90,7 @@ public class ReservaService {
         
         Reserva reserva = optional.get();
         reserva.setEstado(EstadoReserva.CANCELADA);
+        reserva.setUpdatedBy("admin");
         return Optional.of(reserva);
     }
     
@@ -106,6 +113,7 @@ public class ReservaService {
         }
         
         reserva.setEstado(EstadoReserva.EN_CURSO);
+        reserva.setUpdatedBy("admin");
         return Optional.of(reserva);
     }
     
@@ -128,6 +136,7 @@ public class ReservaService {
         }
         
         reserva.setEstado(EstadoReserva.FINALIZADA);
+        reserva.setUpdatedBy("admin");
         return Optional.of(reserva);
     }
 
